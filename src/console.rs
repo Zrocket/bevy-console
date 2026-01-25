@@ -7,7 +7,7 @@ use bevy::ecs::{
 };
 use bevy::platform::hash::FixedState;
 use bevy::{input::keyboard::KeyboardInput, prelude::*};
-use bevy_egui::egui::{self, Align, ScrollArea, TextEdit};
+use bevy_egui::egui::{self, TextEdit};
 use bevy_egui::egui::{Context, Id};
 use bevy_egui::egui::{text::LayoutJob, text_selection::CCursorRange};
 use bevy_egui::{
@@ -475,7 +475,6 @@ pub(crate) fn recompute_predictions(
         let suggestions = match &cache.commands_trie {
             Some(trie) if !query.is_empty() => trie
                 .predictive_search(query)
-                .into_iter()
                 .take(suggestion_count)
                 .collect(),
             _ => vec![],
@@ -489,10 +488,11 @@ pub(crate) fn recompute_predictions(
         state.suggestion_index = None;
         cache.prediction_matches_buffer = false;
 
-        if let Some(first) = cache.predictions_cache.first() {
-            if cache.predictions_cache.len() == 1 && first == &state.buf {
-                cache.prediction_matches_buffer = true
-            }
+        if let Some(first) = cache.predictions_cache.first()
+            && cache.predictions_cache.len() == 1
+            && first == &state.buf
+        {
+            cache.prediction_matches_buffer = true
         }
     }
 }
@@ -694,13 +694,14 @@ fn handle_enter(
     if text_edit_response.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
         // if we have a selected suggestion
         // replace the content of the buffer with it and set the cursor to the end
-        if let Some(index) = state.suggestion_index {
-            if index < cache.predictions_cache.len() && !cache.prediction_matches_buffer {
-                state.buf = cache.predictions_cache[index].clone();
-                state.suggestion_index = None;
-                set_cursor_pos(ui.ctx(), text_edit_response.id, state.buf.len());
-                return;
-            }
+        if let Some(index) = state.suggestion_index
+            && index < cache.predictions_cache.len()
+            && !cache.prediction_matches_buffer
+        {
+            state.buf = cache.predictions_cache[index].clone();
+            state.suggestion_index = None;
+            set_cursor_pos(ui.ctx(), text_edit_response.id, state.buf.len());
+            return;
         }
 
         if state.buf.trim().is_empty() {

@@ -21,23 +21,19 @@ pub struct BevyLogBufferWriter(Arc<Mutex<std::io::Cursor<Vec<u8>>>>);
 impl Write for BevyLogBufferWriter {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         // let lock = self.0.upgrade().unwrap();
-        let mut lock = self.0.lock().map_err(|e| {
-            std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!("Failed to lock buffer: {}", e),
-            )
-        })?;
+        let mut lock = self
+            .0
+            .lock()
+            .map_err(|e| std::io::Error::other(format!("Failed to lock buffer: {}", e)))?;
         lock.write(buf)
     }
 
     fn flush(&mut self) -> std::io::Result<()> {
         // let lock = self.0.upgrade().unwrap();
-        let mut lock = self.0.lock().map_err(|e| {
-            std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!("Failed to lock buffer: {}", e),
-            )
-        })?;
+        let mut lock = self
+            .0
+            .lock()
+            .map_err(|e| std::io::Error::other(format!("Failed to lock buffer: {}", e)))?;
         lock.flush()
     }
 }
