@@ -7,9 +7,13 @@ use bevy_egui::{EguiPlugin, EguiPreUpdateSet, EguiPrimaryContextPass};
 use console::{ConsoleCache, block_keyboard_input, block_mouse_input};
 use trie_rs::TrieBuilder;
 
-use crate::commands::clear::{ClearCommand, clear_command};
-use crate::commands::exit::{ExitCommand, exit_command};
-use crate::commands::help::{HelpCommand, help_command};
+#[cfg(feature = "default-commands")]
+use crate::commands::{
+    clear::{ClearCommand, clear_command},
+    exit::{ExitCommand, exit_command},
+    help::{HelpCommand, help_command},
+};
+
 pub use crate::console::{
     AddConsoleCommand, Command, ConsoleCommand, ConsoleCommandEntered, ConsoleConfiguration,
     ConsoleOpen, NamedCommand, PrintConsoleLine,
